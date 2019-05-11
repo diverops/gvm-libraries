@@ -62,8 +62,7 @@ It can be used with a browser.
 
 
 %prep
-#%autosetup -p 1 -n %{name}-%{version} 
-%autosetup
+%autosetup -p 1 -n gvm-libs-%{version}  
 
 #Fix codepage of the Changelog
 #iconv -f LATIN1 -t UTF8 < ChangeLog > ChangeLog1
