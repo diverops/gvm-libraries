@@ -1,99 +1,78 @@
-%global         gitdate         20180829
-%global         commit          c32cbc912e08bbc8088da9f0aa9c0c2cdfb5ff7b
-%global         shortcommit     %(c=%{commit}; echo ${c:0:7})
-
-Name:           openvas-libraries
-Summary:        Support libraries for Open Vulnerability Assessment (OpenVAS) Scanner
-URL:            https://github.com/greenbone/gvm-libs/releases
-License:        LGPLv2
-Version:        10.0.0
-Release:        1%{?dist}
-Source0:        https://github.com/greenbone/gvm-libs/archive/v%{version}.tar.gz
-Source1:        https://github.com/greenbone/gvm-libs/releases/download/v%{version}/gvm-libs-%{version}.tar.gz.sig
+%global majorversion    10.0
+%global minorversion    0
+%global gvmlibsversion  %{majorversion}.%{minorversion}
 
 
-#Patch1:         openvas-libraries-gcc-warnings.patch
-#Patch2:         openvas-libraries-snmp.patch
-#Patch3:         openvas-libraries-buffer.patch
+Name:             openvas-libraries
+Version:          %{gvmlibsversion}
+Release:          2%{?dist}
+Summary:          Support libraries for Open Vulnerability Assessment (OpenVAS) Scanner
+Group:            Applications/System
+URL:              https://github.com/greenbone/gvm-libs
+License:          LGPLv2
+Source0:          https://github.com/greenbone/gvm-libs/archive/v%{version}.tar.gz
+Source1:          https://github.com/greenbone/gvm-libs/releases/download/v%{version}/gvm-libs-%{version}.tar.gz.sig
 
-##Build error use _DEFAULT_SOURCE instead of _BSD_SOURCE
-#Patch8:        openvas-libraries-bsdsource.patch
+%if 0%{?rhel} >= 7
+ExclusiveArch:    x86_64
+%else
+ExclusiveArch:    %{ix86} x86_64
+%endif
 
-#Fix fo newer version of libssh
-#Patch10:        openvas-libraries-libssh.patch
-
-Obsoletes:      openvas-libnasl
-BuildRequires:  gcc
-BuildRequires:  glib2-devel
-BuildRequires:  libgcrypt-devel
-BuildRequires:  gnutls-devel >= 2.12.10
-BuildRequires:  libpcap-devel
-BuildRequires:  libuuid-devel
-BuildRequires:  libksba-devel
-BuildRequires:  gpgme-devel
-BuildRequires:  cmake >= 2.6.0
-BuildRequires:  bison
-BuildRequires:  flex
-BuildRequires:  pkgconfig
-BuildRequires:  doxygen
-BuildRequires:  openldap-devel
-BuildRequires:  libssh-devel
-BuildRequires:  hiredis-devel
-BuildRequires:  zlib-devel
-BuildRequires:  git
-BuildRequires:  net-snmp-devel
-BuildRequires:  graphviz
+BuildRequires:    gcc
+BuildRequires:    glib2-devel
+BuildRequires:    libgcrypt-devel
+BuildRequires:    gnutls-devel >= 2.12.10
+BuildRequires:    libpcap-devel
+BuildRequires:    libuuid-devel
+BuildRequires:    libksba-devel
+BuildRequires:    gpgme-devel
+BuildRequires:    cmake >= 2.6.0
+BuildRequires:    bison
+BuildRequires:    flex
+BuildRequires:    pkgconfig
+BuildRequires:    doxygen
+BuildRequires:    openldap-devel
+BuildRequires:    libssh-devel
+BuildRequires:    hiredis-devel
+BuildRequires:    zlib-devel
+BuildRequires:    git
+BuildRequires:    net-snmp-devel
+BuildRequires:    graphviz
 
 %description
-openvas-libraries is the base library for the OpenVAS network
+The %{name} project  is the base library for the OpenVAS network
 security scanner.
 
+%package          devel
+Summary:          Development files for openvas-libraries
+Requires:         %{name} = %{version}-%{release}
 
-%package devel
-Summary:        Development files for openvas-libraries
-Requires:       %{name} = %{version}-%{release}
-
-%description devel
+%description      devel
 Development libraries and headers for use with %{name}.
 
 
-%package doc
-Summary:        Documentation for %{name}
-Requires:       %{name} = %{version}-%{release}
+%package          doc
+Summary:          Documentation for %{name}
+Requires:         %{name} = %{version}-%{release}
 
-%description doc
+%description      doc
 You can find documentation for development of %{name} under file://%{_docdir}/%{name}-doc.
 It can be used with a browser.
 
 
 %prep
-# check the validity of GPG signature
-# disabled as the key is not yet submitted
-# gpgv2 --keyring %{SOURCE3} %{SOURCE1} %{SOURCE0} 
-
-%autosetup -p 1 -n gvm-libs-%{version} 
-#-S git
+%autosetup -p 1 -n %{name}-%{version} 
 
 #Fix codepage of the Changelog
 #iconv -f LATIN1 -t UTF8 < ChangeLog > ChangeLog1
 #mv ChangeLog1 ChangeLog
 
-
 %build
 # -Wno-format-truncation:
 # in GCC7 format-truncation throws bogus errors when formating time/date
-export CFLAGS="%{optflags} -Wno-format-truncation"
-
-%if 0%{?fedora} >= 28
-# On F28 the gnutls >= 3.6.2 throws deprecation error
-# https://github.com/greenbone/gvm-libs/issues/63
-export CFLAGS="${CFLAGS} -Wno-error=deprecated-declarations"
-%endif
-
-%if 0%{?fedora} >= 30
-# disable warnings -> error for stringop-truncation for now
+# export CFLAGS="%{optflags} -Wno-format-truncation"
 export CFLAGS="${CFLAGS} -Wno-error=stringop-truncation"
-%endif
 
 %cmake -DLOCALSTATEDIR:PATH=%{_var} -DBUILD_WITH_LDAP=ON .
 # No parallel build because it causes compilation problems
@@ -119,17 +98,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_bindir}/
 
 %files
 %doc COPYING* CHANGES
-#%dir %{_datadir}/openvas
-#%dir %{_sysconfdir}/openvas
-#%{_bindir}/openvas-nasl
-#%{_bindir}/openvas-nasl-lint
-%{_bindir}/openvas-check-setup
-#%{_mandir}/man1/openvas-nasl.1*
-#%{_mandir}/man1/openvas-nasl-lint.1*
-
 %{_libdir}/libgvm_base.so.*
-#%{_libdir}/libopenvas_misc.so.*
-#%{_libdir}/libopenvas_nasl.so.*
 %{_libdir}/libgvm_gmp.so.*
 %{_libdir}/libgvm_osp.so.*
 %{_libdir}/libgvm_util.so.*
@@ -149,9 +118,10 @@ install -m 755 %{SOURCE2} %{buildroot}%{_bindir}/
 
 %files doc
 %doc doc/generated/html
-#%doc doc/test_ipv6_packet_forgery.nasl
 
 %changelog
+
+
 * Sat Apr 06 2019 josef radinger <cheese@nosuchhost.net> - 10.0.0-1
 - bump version
 - new path to sources
