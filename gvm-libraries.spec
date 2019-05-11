@@ -4,9 +4,7 @@
 
 Name:           openvas-libraries
 Summary:        Support libraries for Open Vulnerability Assessment (OpenVAS) Scanner
-URL:            http://www.openvas.org
-#               http://www.openvas.org/install-source.html
-#               https://github.com/greenbone/gvm-libs/releases
+URL:            https://github.com/greenbone/gvm-libs/releases
 License:        LGPLv2
 Version:        10.0.0
 Release:        1%{?dist}
