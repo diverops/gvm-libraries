@@ -3,10 +3,10 @@
 %global gvmlibsversion  %{majorversion}.%{minorversion}
 
 
-Name:             openvas-libraries
+Name:             gvm-libraries
 Version:          %{gvmlibsversion}
 Release:          2%{?dist}
-Summary:          Support libraries for Open Vulnerability Assessment (OpenVAS) Scanner
+Summary:          Greenbone Vulnerability Management Libraries
 Group:            Applications/System
 URL:              https://github.com/greenbone/gvm-libs
 License:          LGPLv2
@@ -41,11 +41,11 @@ BuildRequires:    net-snmp-devel
 BuildRequires:    graphviz
 
 %description
-The %{name} project  is the base library for the OpenVAS network
+The %{name} project  is the base library for the Greenbone Vulnerability Management 
 security scanner.
 
 %package          devel
-Summary:          Development files for openvas-libraries
+Summary:          Development files for gvm-libraries
 Requires:         %{name} = %{version}-%{release}
 
 %description      devel
@@ -88,11 +88,9 @@ find %{buildroot} -name '*.la' -delete
 find %{buildroot} -name '*.a' -delete
 
 # Currently I don't know for what is this used so I removing it
-rm -f %{buildroot}/%{_datadir}/openvas/openvas-lsc-rpm-creator.sh
+# rm -f %{buildroot}/%{_datadir}/openvas/openvas-lsc-rpm-creator.sh
 
 mkdir -p %{buildroot}%{_bindir}/
-#Install openvas-check-setup
-install -m 755 %{SOURCE2} %{buildroot}%{_bindir}/
 
 %ldconfig_scriptlets
 
